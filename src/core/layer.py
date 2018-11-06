@@ -38,7 +38,8 @@ def Orthonorm(x, name=None):
     # compute orthogonalizing matrix
     ortho_weights = orthonorm_op(x)
     # create variable that holds this matrix
-    ortho_weights_store = K.variable(np.zeros((d,d)))
+    with tf.variable_scope('', reuse=tf.AUTO_REUSE):
+        ortho_weights_store = tf.get_variable(name="ortho_weights_store", shape=(d,d))
     # create op that saves matrix into variable
     ortho_weights_update = tf.assign(ortho_weights_store, ortho_weights, name='ortho_weights_update')
     # switch between stored and calculated weights based on training or validation
@@ -107,6 +108,7 @@ def stack_layers(inputs, layers, kernel_initializer='glorot_uniform'):
 
         # apply the layer to each input in inputs
         for k in outputs:
-            outputs[k]=l(outputs[k])
+            with tf.name_scope(k):
+                outputs[k]=l(outputs[k])
 
     return outputs

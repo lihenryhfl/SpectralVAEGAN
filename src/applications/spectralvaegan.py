@@ -22,7 +22,7 @@ from core import networks
 from core.layer import stack_layers
 from core.util import get_scale, print_accuracy, get_cluster_sols, LearningHandler, make_layer_list, train_gen, get_y_preds
 
-def run_net(data, params):
+def run_gan(data, params):
     #
     # UNPACK DATA
     #
@@ -59,9 +59,9 @@ def run_net(data, params):
 
     # spectralnet has three inputs -- they are defined here
     inputs = {
-            'Unlabeled': Input(shape=input_shape, name='UnlabeledInput'),
-            'Labeled': Input(shape=input_shape, name='LabeledInput'),
-            'Orthonorm': Input(shape=input_shape, name='OrthonormInput'),
+            'Unlabeled': Input(shape=input_shape,name='UnlabeledInput'),
+            'Labeled': Input(shape=input_shape,name='LabeledInput'),
+            'Orthonorm': Input(shape=input_shape,name='OrthonormInput'),
             }
 
     #
@@ -93,7 +93,27 @@ def run_net(data, params):
             params['spec_lr'], params['spec_drop'], params['spec_patience'],
             params['spec_ne'])
 
+    # s_train_unlabeled = siamese_net.predict(x_train_unlabeled, 32)
+    # s_val_unlabeled = siamese_net.predict(x_val_unlabeled, 32)
+
+    spectral_vae = networks.SpectralVAEGAN(inputs, spectral_net)
+    spectral_vae.train((x_train_unlabeled, x_train_unlabeled), (x_val_unlabeled, x_val_unlabeled))
+
+    x_vae = x_test
+    x_vae_labels = y_test
+    y_vae = spectral_vae.generate_from_samples(x_vae)
+    # y_vae = spectral_vae.generate(len(x_vae))
+    # print('y_vae.shape', y_vae.shape, x_vae.shape)
+
+    import pickle
+    with open('vae_results_{}.pkl'.format(params['gpu']), 'wb') as f:
+        pickle.dump((x_vae, y_vae, x_vae_labels), f)
+
     print("finished training")
+
+    #
+    # DEFINE AND TRAIN VAEGAN
+    #
 
     #
     # EVALUATE

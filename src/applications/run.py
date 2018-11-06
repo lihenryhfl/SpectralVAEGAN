@@ -14,6 +14,7 @@ from collections import defaultdict
 
 from core.data import get_data
 from spectralnet import run_net
+from spectralvaegan import run_gan
 
 # PARSE ARGUMENTS
 parser = argparse.ArgumentParser()
@@ -32,6 +33,8 @@ general_params = {
         'val_set_fraction': 0.1,            # fraction of training set to use as validation
         'precomputedKNNPath': '',           # path for precomputed nearest neighbors (with indices and saved as a pickle or h5py file)
         'siam_batch_size': 128,             # minibatch size for siamese net
+        'gpu': args.gpu,
+        'generalization_metrics': True,     # enable to check out of set generalization error and nmi
         }
 params.update(general_params)
 
@@ -39,8 +42,8 @@ params.update(general_params)
 if args.dset == 'mnist':
     mnist_params = {
         'n_clusters': 10,                   # number of clusters in data
-        'use_code_space': True,             # enable / disable code space embedding
-        'affinity': 'siamese',              # affinity type: siamese / knn
+        'use_code_space': False,             # enable / disable code space embedding
+        'affinity': 'knn',              # affinity type: siamese / knn
         'n_nbrs': 3,                        # number of nonzero entries (neighbors) to use for graph Laplacian affinity matrix
         'scale_nbr': 2,                     # neighbor used to determine scale of gaussian graph Laplacian; calculated by
                                             # taking median distance of the (scale_nbr)th neighbor, over a set of size batch_size
@@ -50,7 +53,7 @@ if args.dset == 'mnist':
                                             # a 'positive' pair by siamese net
 
         'siam_ne': 400,                     # number of training epochs for siamese net
-        'spec_ne': 400,                     # number of training epochs for spectral net
+        'spec_ne': 0,                     # number of training epochs for spectral net
         'siam_lr': 1e-3,                    # initial learning rate for siamese net
         'spec_lr': 1e-3,                    # initial learning rate for spectral net
         'siam_patience': 10,                # early stopping patience for siamese net
@@ -70,7 +73,7 @@ if args.dset == 'mnist':
             {'type': 'relu', 'size': 10},
             ],
         'use_approx': False,                # enable / disable approximate nearest neighbors
-        'use_all_data': True,               # enable to use all data for training (no test set)
+        'use_all_data': False,              # enable to use all data for training (no test set)
         }
     params.update(mnist_params)
 elif args.dset == 'reuters':
@@ -106,7 +109,7 @@ elif args.dset == 'reuters':
 elif args.dset == 'cc':
     cc_params = {
         # data generation parameters
-        'train_set_fraction': 1.,       # fraction of the dataset to use for training
+        'train_set_fraction': .8,       # fraction of the dataset to use for training
         'noise_sig': 0.1,               # variance of the gaussian noise applied to x
         'n': 1500,                      # number of total points in dataset
         # training parameters
@@ -116,6 +119,7 @@ elif args.dset == 'cc':
         'n_nbrs': 2,
         'scale_nbr': 2,
         'spec_ne': 300,
+        # 'spec_ne': 3,
         'spec_lr': 1e-3,
         'spec_patience': 30,
         'spec_drop': 0.1,
@@ -123,14 +127,17 @@ elif args.dset == 'cc':
         'batch_size_orthonorm': 128,
         'spec_reg': None,
         'arch': [
-            {'type': 'softplus', 'size': 50},
-            {'type': 'BatchNormalization'},
-            {'type': 'softplus', 'size': 50},
-            {'type': 'BatchNormalization'},
-            {'type': 'softplus', 'size': 50},
-            {'type': 'BatchNormalization'},
+            # {'type': 'softplus', 'size': 50},
+            # {'type': 'BatchNormalization'},
+            # {'type': 'softplus', 'size': 50},
+            # {'type': 'BatchNormalization'},
+            # {'type': 'softplus', 'size': 50},
+            # {'type': 'BatchNormalization'},
+            {'type': 'relu', 'size': 512},
+            {'type': 'relu', 'size': 256},
+            {'type': 'relu', 'size': 128},
             ],
-        'use_all_data': True,
+        'use_all_data': False,
         }
     params.update(cc_params)
 elif args.dset == 'cc_semisup':
@@ -162,7 +169,7 @@ elif args.dset == 'cc_semisup':
             {'type': 'softplus', 'size': 50},
             {'type': 'BatchNormalization'},
             ],
-        'generalization_metrics': True, # enable to check out of set generalization error and nmi
+        'generalization_metrics': True,
         'use_all_data': False,
         }
     params.update(cc_semisup_params)
@@ -171,9 +178,9 @@ elif args.dset == 'cc_semisup':
 data = get_data(params)
 
 # RUN EXPERIMENT
-x_spectralnet, y_spectralnet = run_net(data, params)
+x_spectralnet, y_spectralnet = run_gan(data, params)
 
-if args.dset in ['cc', 'cc_semisup']:
-    # run plotting script
-    import plot_2d
-    plot_2d.process(x_spectralnet, y_spectralnet, data, params)
+# if args.dset in ['cc', 'cc_semisup']:
+    # # run plotting script
+    # import plot_2d
+    # plot_2d.process(x_spectralnet, y_spectralnet, data, params)
