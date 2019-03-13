@@ -227,12 +227,20 @@ class SpectralVAEGAN:
             print("WE'RE HERE")
             v = tf.get_variable("ortho_weights_store")
         ows = sess.run(v)
-        n, m = ows.shape
-        b = np.ones((n,))
-        l = Dense(m, activation=None, input_shape=(n,), weights=(ows, b))
+        # n, m = ows.shape
+        # b = np.ones((n,))
+        # l = Dense(m, activation=None, input_shape=(n,), weights=(ows, b))
+        t_ows = K.variable(ows)
+        l = Lambda(lambda x: K.dot(x, t_ows))
         l.trainable = False
         x.append(l(x[-1]))
         layers.append(l)
+
+        sn = Model(inputs=self.inputs, outputs=x[-2])
+        import pickle
+        with open('ows.pkl', 'wb') as f:
+            pickle.dump(ows, f)
+        sn.save('sn_fixed.h5')
 
         self.mu = mu = x = x[-1]
 
@@ -355,8 +363,8 @@ class SpectralVAEGAN:
         class PlotExamples(Callback):
             def __init__(self):
                 super(PlotExamples, self).__init__()
-                json_path = '/home/henry/Projects/SpectralVAEGAN/src/pretrain_weights/ae_mnist.json'
-                weights_path = '/home/henry/Projects/SpectralVAEGAN/src/pretrain_weights/ae_mnist_weights.h5'
+                json_path = '/home/henry/projects/SpectralVAEGAN/src/pretrain_weights/ae_mnist.json'
+                weights_path = '/home/henry/projects/SpectralVAEGAN/src/pretrain_weights/ae_mnist_weights.h5'
                 with open(json_path) as f:
                     self.pt_ae = pt_ae = model_from_json(f.read())
                 pt_ae.load_weights(weights_path)

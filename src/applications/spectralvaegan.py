@@ -85,13 +85,12 @@ def run_gan(data, params):
 
     spectral_net = networks.SpectralNet(inputs, params['arch'],
             params.get('spec_reg'), y_true, y_train_labeled_onehot,
-            params['n_clusters'], params['affinity'], params['scale_nbr'],
+            2, 'knn', params['scale_nbr'],
             params['n_nbrs'], batch_sizes, siamese_net, x_train, len(x_train_labeled))
 
     spectral_net.train(
             x_train_unlabeled, x_train_labeled, x_val_unlabeled,
-            params['spec_lr'], params['spec_drop'], params['spec_patience'],
-            params['spec_ne'])
+            1e-3, 0.1, 30, 300)
 
     # s_train_unlabeled = siamese_net.predict(x_train_unlabeled, 32)
     # s_val_unlabeled = siamese_net.predict(x_val_unlabeled, 32)

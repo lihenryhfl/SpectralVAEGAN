@@ -40,6 +40,10 @@ def Orthonorm(x, name=None):
     # create variable that holds this matrix
     with tf.variable_scope('', reuse=tf.AUTO_REUSE):
         ortho_weights_store = tf.get_variable(name="ortho_weights_store", shape=(d,d))
+
+    # temp = K.dot(x, ortho_weights)
+    # temp = tf.matmul(temp, temp, transpose_a=True)
+    # ortho_weights = tf.Print(ortho_weights, [tf.reduce_sum(temp, axis=0)], 'ortho_weights normalized?? ')
     # create op that saves matrix into variable
     ortho_weights_update = tf.assign(ortho_weights_store, ortho_weights, name='ortho_weights_update')
     # switch between stored and calculated weights based on training or validation
