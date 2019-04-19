@@ -74,12 +74,13 @@ class SiameseNet:
 
 class SpectralNet:
     def __init__(self, inputs, arch, spec_reg, y_true, y_train_labeled_onehot,
-            n_clusters, affinity, scale_nbr, n_nbrs, batch_sizes,
+            n_clusters, affinity, scale_nbr, n_nbrs, batch_sizes, normalized=True,
             siamese_net=None, x_train=None, have_labeled=False):
         self.y_true = y_true
         self.y_train_labeled_onehot = y_train_labeled_onehot
         self.inputs = inputs
         self.batch_sizes = batch_sizes
+        self.normalized = normalized
         # generate layers
         self.layers = make_layer_list(arch[:-1], 'spectral', spec_reg)
         self.layers += [
@@ -126,9 +127,14 @@ class SpectralNet:
             W = tf.concat((W_u, W_l), axis=0)
 
             # create pairwise batch distance matrix self.Dy
-            self.Dy = costs.squared_distance(tf.concat([self.outputs['Unlabeled'], self.outputs['Labeled']], axis=0))
+            y_ = tf.concat([self.outputs['Unlabeled'], self.outputs['Labeled']], axis=0)
         else:
-            self.Dy = costs.squared_distance(self.outputs['Unlabeled'])
+            y_ = self.outputs['Unlabeled']
+            
+        if self.normalized:
+            y_ = y_ / tf.reduce_sum(W, axis=1)
+        
+        self.Dy = costs.squared_distance(y_)
 
         # define loss
         self.loss = K.sum(W * self.Dy) / (2 * batch_sizes['Unlabeled'])

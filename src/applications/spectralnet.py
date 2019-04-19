@@ -86,7 +86,8 @@ def run_net(data, params):
     spectral_net = networks.SpectralNet(inputs, params['arch'],
             params.get('spec_reg'), y_true, y_train_labeled_onehot,
             params['n_clusters'], params['affinity'], params['scale_nbr'],
-            params['n_nbrs'], batch_sizes, siamese_net, x_train, len(x_train_labeled))
+            params['n_nbrs'], batch_sizes, siamese_net=siamese_net,
+            x_train=x_train, have_labeled=len(x_train_labeled))
 
     spectral_net.train(
             x_train_unlabeled, x_train_labeled, x_val_unlabeled,
