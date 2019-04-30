@@ -52,7 +52,7 @@ def Orthonorm(x, name=None):
     l.add_update(ortho_weights_update)
     return l
 
-def stack_layers(inputs, layers, kernel_initializer='glorot_uniform'):
+def stack_layers(inputs, layers, kernel_initializer='glorot_uniform', return_all_layers=False):
     '''
     Builds the architecture of the network by applying each layer specified in layers to inputs.
 
@@ -71,19 +71,21 @@ def stack_layers(inputs, layers, kernel_initializer='glorot_uniform'):
     * this is necessary since spectralnet takes multiple inputs and performs special computations on the
       orthonorm layer
     '''
-    outputs = dict()
+    outputs = [dict() for _ in range(len(layers) + 1)]
 
     for key in inputs:
-        outputs[key]=inputs[key]
+        outputs[0][key]=inputs[key]
 
-    for layer in layers:
+    for i, layer in enumerate(layers):
         # check for l2_reg argument
         l2_reg = layer.get('l2_reg')
         if l2_reg:
             l2_reg = l2(layer['l2_reg'])
 
         # create the layer
-        if layer['type'] == 'softplus_reg':
+        if layer['type'] == 'linear':
+            l = Dense(layer['size'], activation='linear', kernel_initializer=kernel_initializer, kernel_regularizer=l2_reg, name=layer.get('name'))
+        elif layer['type'] == 'softplus_reg':
             l = Dense(layer['size'], activation='softplus', kernel_initializer=kernel_initializer, kernel_regularizer=l2(0.001), name=layer.get('name'))
         elif layer['type'] == 'softplus':
             l = Dense(layer['size'], activation='softplus', kernel_initializer=kernel_initializer, kernel_regularizer=l2_reg, name=layer.get('name'))
@@ -106,13 +108,16 @@ def stack_layers(inputs, layers, kernel_initializer='glorot_uniform'):
         elif layer['type'] == 'Flatten':
             l = Flatten(name=layer.get('name'))
         elif layer['type'] == 'Orthonorm':
-            l = Orthonorm(outputs['Orthonorm'], name=layer.get('name'));
+            l = Orthonorm(outputs[i]['Orthonorm'], name=layer.get('name'));
         else:
             raise ValueError("Invalid layer type '{}'".format(layer['type']))
 
         # apply the layer to each input in inputs
-        for k in outputs:
+        for k in outputs[i]:
             with tf.name_scope(k):
-                outputs[k]=l(outputs[k])
+                outputs[i+1][k] = l(outputs[i][k])
 
-    return outputs
+    if return_all_layers:
+        return outputs
+    else:
+        return outputs[-1]
