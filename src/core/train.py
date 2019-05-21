@@ -114,6 +114,9 @@ def predict(predict_var, x_unlabeled, inputs, y_true, batch_sizes,
     '''
     x_unlabeled, x_labeled, y_labeled = check_inputs(x_unlabeled, x_labeled, y_labeled, y_true)
 
+    if not isinstance(predict_var, list):
+        predict_var = [predict_var]
+
     # combined data
     x = np.concatenate((x_unlabeled, x_labeled), 0)
     # get shape of y_true
@@ -127,7 +130,7 @@ def predict(predict_var, x_unlabeled, inputs, y_true, batch_sizes,
     batch_size = min(len(x), max(unlabeled_batch_size, labeled_batch_size))
     batches = make_batches(len(x), batch_size)
 
-    y_preds = []
+    y_preds = [[] for _ in predict_var]
     # predict over all points
     for i, (batch_start, batch_end) in enumerate(batches):
         feed_dict = {K.learning_phase(): 0}
@@ -152,13 +155,16 @@ def predict(predict_var, x_unlabeled, inputs, y_true, batch_sizes,
                 raise Exception("Unrecognized feed name ['{}']".format(input_type))
 
         # evaluate the batch
-        y_pred_batch = np.asarray(K.get_session().run(predict_var, feed_dict=feed_dict))
-        y_preds.append(y_pred_batch)
+        y_pred_batch = [np.array(x) for x in K.get_session().run(predict_var, feed_dict=feed_dict)]
+        [el1.append(el2) for el1, el2 in zip(y_preds, y_pred_batch)]
 
-    if len(y_preds[0].shape):
-        return np.concatenate(y_preds)
-    else:
-        return np.sum(y_preds)
+    y_preds_ = []
+    for y_ in y_preds:
+        if len(y_[0].shape):
+            y_preds_.append(np.concatenate(y_, axis=0))
+        else:
+            y_preds_.append(y_)
+    return y_preds_
 
 def predict_sum(predict_var, x_unlabeled, inputs, y_true, batch_sizes, x_labeled=None, y_labeled=None):
     '''
@@ -166,5 +172,5 @@ def predict_sum(predict_var, x_unlabeled, inputs, y_true, batch_sizes, x_labeled
     per tensor in predict_var
     '''
     y = predict(predict_var, x_unlabeled, inputs, y_true, batch_sizes,
-            x_labeled=x_labeled, y_labeled=y_labeled)
+            x_labeled=x_labeled, y_labeled=y_labeled)[0]
     return np.sum(y)
