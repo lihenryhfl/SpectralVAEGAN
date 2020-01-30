@@ -74,7 +74,7 @@ class SiameseNet:
 
 class SpectralNet:
     def __init__(self, inputs, arch, spec_reg, y_true, y_train_labeled_onehot,
-            n_clusters, affinity, scale_nbr, n_nbrs, batch_sizes, normalized=True,
+            n_clusters, affinity, scale_nbr, n_nbrs, batch_sizes, normalized=False,
             siamese_net=None, x_train=None, have_labeled=False):
         self.y_true = y_true
         self.y_train_labeled_onehot = y_train_labeled_onehot
@@ -130,10 +130,10 @@ class SpectralNet:
             y_ = tf.concat([self.outputs['Unlabeled'], self.outputs['Labeled']], axis=0)
         else:
             y_ = self.outputs['Unlabeled']
-            
+
         if self.normalized:
             y_ = y_ / tf.reduce_sum(W, axis=1)
-        
+
         self.Dy = costs.squared_distance(y_)
 
         # define loss

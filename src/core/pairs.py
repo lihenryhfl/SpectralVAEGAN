@@ -22,7 +22,7 @@ from keras.layers import Conv2D, MaxPooling2D
 from keras.callbacks import LearningRateScheduler
 
 from sklearn import metrics
-# from annoy import AnnoyIndex
+from annoy import AnnoyIndex
 
 ##### Helper functions #####
 def get_choices(arr, num_choices, valid_range=[-1, np.inf], not_arr=None, replace=False):
@@ -191,7 +191,6 @@ def create_pairs_from_unlabeled_data(x1, x2=None, y=None, p=None, k=5, tot_pairs
             x1_flat = x1[:n]
 
         if use_approx:
-            raise NotImplementedError()
             ann = AnnoyIndex(x1_flat.shape[1], metric='euclidean')
             for i, x_ in enumerate(x1_flat):
                 ann.add_item(i, x_)

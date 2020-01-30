@@ -1,7 +1,7 @@
 '''
 layer.py: contains functions used to build all spectral and siamese net models
 '''
-from keras.layers import Dense, BatchNormalization, Flatten, Conv2D, MaxPooling2D, Lambda, Dropout
+from keras.layers import Dense, BatchNormalization, Flatten, Conv2D, MaxPooling2D, Lambda, Dropout, LeakyReLU
 from keras import backend as K
 import tensorflow as tf
 import numpy as np
@@ -98,11 +98,11 @@ def stack_layers(inputs, layers, kernel_initializer='glorot_uniform', return_all
         elif layer['type'] == 'selu':
             l = Dense(layer['size'], activation='selu', kernel_initializer=kernel_initializer, kernel_regularizer=l2_reg, name=layer.get('name'))
         elif layer['type'] == 'Conv2D':
-            l = Conv2D(layer['channels'], kernel_size=layer['kernel'], activation='relu', data_format='channels_last', kernel_regularizer=l2_reg, name=layer.get('name'))
+            l = Conv2D(layer['channels'], strides=layer['strides'], kernel_size=layer['kernel'], activation=LeakyReLU(), data_format='channels_last', kernel_regularizer=l2_reg, name=layer.get('name'))
         elif layer['type'] == 'BatchNormalization':
             l = BatchNormalization(name=layer.get('name'))
         elif layer['type'] == 'MaxPooling2D':
-            l = MaxPooling2D(pool_size=layer['pool_size'], data_format='channels_first', name=layer.get('name'))
+            l = MaxPooling2D(pool_size=layer['pool_size'], data_format='channels_last', name=layer.get('name'))
         elif layer['type'] == 'Dropout':
             l = Dropout(layer['rate'], name=layer.get('name'))
         elif layer['type'] == 'Flatten':

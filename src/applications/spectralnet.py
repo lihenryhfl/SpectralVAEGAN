@@ -59,9 +59,9 @@ def run_net(data, params):
 
     # spectralnet has three inputs -- they are defined here
     inputs = {
-            'Unlabeled': Input(shape=input_shape, name='UnlabeledInput'),
-            'Labeled': Input(shape=input_shape, name='LabeledInput'),
-            'Orthonorm': Input(shape=input_shape, name='OrthonormInput'),
+            'Unlabeled': Input(shape=input_shape,name='UnlabeledInput'),
+            'Labeled': Input(shape=input_shape,name='LabeledInput'),
+            'Orthonorm': Input(shape=input_shape,name='OrthonormInput'),
             }
 
     #
@@ -83,11 +83,11 @@ def run_net(data, params):
     # DEFINE AND TRAIN SPECTRALNET
     #
 
+    print(type(siamese_net))
     spectral_net = networks.SpectralNet(inputs, params['arch'],
             params.get('spec_reg'), y_true, y_train_labeled_onehot,
             params['n_clusters'], params['affinity'], params['scale_nbr'],
-            params['n_nbrs'], batch_sizes, siamese_net=siamese_net,
-            x_train=x_train, have_labeled=len(x_train_labeled))
+            params['n_nbrs'], batch_sizes, False, siamese_net, x_train, len(x_train_labeled))
 
     spectral_net.train(
             x_train_unlabeled, x_train_labeled, x_val_unlabeled,
