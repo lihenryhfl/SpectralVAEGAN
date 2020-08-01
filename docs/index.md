@@ -1,6 +1,8 @@
 ### DVAE
 Diffusion Variational Auto Encoder is a generative model that combines ideas from spectral manifold learning and variational inference.
 
+![GitHub Logo](diagram.png)
+Format: ![Alt Text](url)
 
 ### Installation from GitHub
 git clone 
