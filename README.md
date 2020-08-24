@@ -23,4 +23,4 @@ git clone https://github.com/lihenryhfl/SpectralVAEGAN.git; cd SpectralVAEGAN; p
 ```
 
 ## usage
-For example usage, please see the example script `vdae_examples.ipynb`
+For example usage, please see the example script `vdae_examples.ipynb`.
