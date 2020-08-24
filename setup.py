@@ -16,7 +16,7 @@ setuptools.setup(
     url="https://github.com/lihenryhfl/SpectralVAEGAN",
     packages=setuptools.find_packages(),
     install_requires=[
-        'tensorflow-gpu==1.8.0',
+        'tensorflow-gpu==1.15.2',
         'POT',
         'annoy',
         'sklearn',
