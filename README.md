@@ -6,8 +6,7 @@ VDAE is a python library that performs spectral clustering with deep neural netw
 ## requirements
 To run our package, you'll need Python 3.x and the following python packages:
 - scikit-learn
-- tensorflow==1.15
-- munkres
+- tensorflow==1.15.2
 - annoy
 - h5py
 - POT
