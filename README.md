@@ -1,4 +1,4 @@
-# SpectralNet
+# Diffusion VAE
 ![cc](https://user-images.githubusercontent.com/9156971/34493923-1abbabe8-efbc-11e7-8788-66c62bc91f4d.png)
 
 SpectralNet is a python library that performs spectral clustering with deep neural networks.
