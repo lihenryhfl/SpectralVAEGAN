@@ -157,7 +157,11 @@ class SpectralNet:
         self.train_step = tf.train.RMSPropOptimizer(learning_rate=self.learning_rate).minimize(self.loss, var_list=self.net.trainable_weights)
 
         # initialize spectralnet variables
-        K.get_session().run(tf.variables_initializer(self.net.trainable_weights))
+        with tf.variable_scope('', reuse=tf.AUTO_REUSE):
+            ortho_weights_store = tf.get_variable(name="ortho_weights_store")
+        print("IMPORTANT:", self.net.trainable_weights, ortho_weights_store)
+        # K.get_session().run(tf.variables_initializer(self.net.trainable_weights + [ortho_weights_store, self.learning_rate]))
+        K.get_session().run(tf.initialize_all_variables())
 
     def train(self, x_train_unlabeled, x_train_labeled, x_val_unlabeled,
             lr, drop, patience, num_epochs, single_step=False):

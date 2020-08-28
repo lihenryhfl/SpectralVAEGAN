@@ -15,12 +15,17 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/lihenryhfl/SpectralVAEGAN",
     packages=setuptools.find_packages(),
+    extra_packages = {
+    'tensorflow': ['tensorflow==1.15'],
+    'tensorflow with gpu': ['tensorflow-gpu==1.15']
+    },
     install_requires=[
-        'tensorflow-gpu==1.15.2',
         'POT',
         'annoy',
+        'scipy',
         'sklearn',
-        'h5py'
+        'keras==2.3.0',
+        'matplotlib'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
