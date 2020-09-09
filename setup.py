@@ -7,7 +7,7 @@ Variational Diffusion Autoencoders with Random Walk Sampling. See https://arxiv.
 
 setuptools.setup(
     name="vdae", # Replace with your own username
-    version="0.0.1",
+    version="0.0.2",
     author="Henry,Ofir",
     author_email="henry.li@yale.edu",
     description="python package for variational diffusion autoencoders",

@@ -161,7 +161,7 @@ class SpectralNet:
             ortho_weights_store = tf.get_variable(name="ortho_weights_store")
         print("IMPORTANT:", self.net.trainable_weights, ortho_weights_store)
         # K.get_session().run(tf.variables_initializer(self.net.trainable_weights + [ortho_weights_store, self.learning_rate]))
-        K.get_session().run(tf.initialize_all_variables())
+        K.get_session().run(tf.global_variables_initializer())
 
     def train(self, x_train_unlabeled, x_train_labeled, x_val_unlabeled,
             lr, drop, patience, num_epochs, single_step=False):
