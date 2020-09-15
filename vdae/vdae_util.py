@@ -328,7 +328,7 @@ def generate_faces(train_set_fraction=.8):
     return shuffle_and_return_n(x, y, train_set_fraction)
 
 def generate_bulldog(train_set_fraction=.8):
-    x = np.load('BuldogBig.npy').T
+    x = np.load('bulldog.npy').T
     y = np.arange(len(x))
     print(x.shape)
 

@@ -14,7 +14,6 @@ from keras.callbacks import EarlyStopping
 from keras import backend as K
 from keras.models import Sequential, Model, load_model
 from keras.layers import Input, Lambda, Subtract, Dense, Conv2DTranspose, Dropout, Reshape, Flatten, UpSampling2D, Activation
-from keras.layers.merge import _Merge
 from keras.activations import relu
 from keras.layers.advanced_activations import LeakyReLU
 from keras.optimizers import RMSprop, Adam
