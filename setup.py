@@ -24,7 +24,7 @@ setuptools.setup(
         'annoy',
         'scipy',
         'sklearn',
-        'keras==2.3.0',
+        'keras==2.13.1',
         'matplotlib'
     ],
     classifiers=[
